@@ -7,8 +7,6 @@ import os
 
 from dotenv import load_dotenv
 
-from chatbot import cb
-
 load_dotenv()
 
 chat = APIRouter()
@@ -28,7 +26,7 @@ async def websocket_endpoint(websocket: WebSocket = WebSocket):
     try:
         while True:
             data = await websocket.receive_text()
-            data = cb.get_response(data)
+            data = {'response': 'TEST SERVER'}
             await manager.send_message({"data": data}, websocket)
     except WebSocketDisconnect:
         manager.disconnect(websocket)
