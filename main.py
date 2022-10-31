@@ -6,7 +6,7 @@ import uvicorn
 import os
 
 import logging
-
+logging.basicConfig(level=logging.INFO)
 chat = APIRouter()
 
 manager = ConnectionManager()
