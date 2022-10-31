@@ -5,13 +5,10 @@ from connection import ConnectionManager
 import uvicorn
 import os
 
-from dotenv import load_dotenv
-
-load_dotenv()
-
 chat = APIRouter()
 
 manager = ConnectionManager()
+
 
 @chat.websocket("/chat")
 async def websocket_endpoint(websocket: WebSocket = WebSocket):
@@ -35,9 +32,6 @@ async def websocket_endpoint(websocket: WebSocket = WebSocket):
 api = FastAPI()
 api.include_router(chat)
 
-if __name__ == '__main__':
-    
-    if os.environ.get('APP_ENV') == 'development':
-        uvicorn.run("main:api", reload=True)
-    else:
-        uvicorn.run("main:api")
+@api.route('/')
+async def home():
+    return {"success": "hello"}
