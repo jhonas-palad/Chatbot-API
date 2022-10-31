@@ -5,6 +5,8 @@ from connection import ConnectionManager
 import uvicorn
 import os
 
+import logging
+
 chat = APIRouter()
 
 manager = ConnectionManager()
@@ -23,6 +25,7 @@ async def websocket_endpoint(websocket: WebSocket = WebSocket):
     try:
         while True:
             data = await websocket.receive_text()
+            logging.log(logging.INFO, f"{data}")
             data = {'response': 'TEST SERVER'}
             await manager.send_message({"data": data}, websocket)
     except WebSocketDisconnect:
