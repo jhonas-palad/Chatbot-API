@@ -1,0 +1,109 @@
+[
+    {
+        "tag": "chatbot_identity",
+        "patterns":[
+            "What is your name?",
+            "What's your name?",
+            "Who are you?",
+            "Give me your name?",
+            "Can I ask your name?"
+        ],
+        "responses": [
+            "Hi, my name is AsKetty",
+            "You can call me AsKetty",
+            "AsKetty is my name"
+        ],
+        "follow_up_responses":[
+            "I'll try my best to answer your queries."
+        ]
+    },
+    {
+        "tag": "verbs",
+        "patterns": [
+            "how",
+            "what",
+            "when",
+            "where"
+        ],
+        "responses":[
+            "Please refine your query, so i can understand it better"
+        ],
+        "follow_up_responses": []
+    },
+    {
+        "tag": "greeting",
+        "patterns": [
+            "Hello",
+            "How are you?",
+            "How's your day?",
+            "Hey there"
+        ],
+        "responses": [
+            "Hi, What can I help?",
+            "Everything is great, please ask me a query?"
+        ],
+        "follow_up_responses": []
+    },
+    {
+        "tag": "farewell",
+        "patterns": [
+            "Goodbye",
+            "Bye",
+            "Babye",
+            "See you later",
+            "Good bye",
+            "Farewell"
+        ],
+        "responses": [
+            "Goodbye have a great day",
+            "Ok, goodbye"
+        ],
+        "follow_up_responses": []
+    },
+    {
+        "tag": "payment_channels",
+        "patterns": [
+            "Modes of payment?",
+            "Where can I make payment",
+            "Where should I pay?",
+            "What are the payment methods available",
+            "Payment methods",
+            "List of payment methods"
+        ],
+        "responses":[
+            "You can visit this link if you wish to transact online https://ebrahmanlipa.ub.edu.ph/uboplc/"
+        ],
+        "follow_up_responses": [
+            "You can go directly to the main campus for direct payment"
+        ]
+    },
+    {
+        "tag": "document_request",
+        "patterns": [
+            "How to get TOR",
+            "How to request a transcript of records",
+            "Transcript of records procedure",
+            "Claim TOR",
+            "Request TOR",
+            "Request Transcript of records",
+            "School documents procedure",
+            "How to request for school documents",
+            "Request for school documents",
+            "How can I get school documents",
+            "How can I get my TOR",
+            "How can I get my certificates",
+            "How can I get my Transcript of Records",
+            "Requesting documents step",
+            "How to get my diploma",
+            "Steps of getting Diploma",
+            "Request Diploma"
+        ],
+        "responses":[
+            "Alumni, former students and other clients are directed to the Registrar's office to secure and fillout Document Request Form."
+        ],
+        "follow_up_responses": [
+            "Currently enrolled students are not required to undergo the clearance procedure.",
+            "The Registrar's office will only issue client's request once the alumni/former students of Batangas and Lipa campuses are cleared of all obligations as seen on the Student Clearance System"
+        ]
+    }
+]

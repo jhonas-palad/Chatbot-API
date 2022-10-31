@@ -1,0 +1,39 @@
+#! /usr/bin/env python
+
+import argparse
+
+import sys
+import os
+
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='Command line for chatbot')
+    parser.add_argument('--train',metavar='FILENAME', \
+                        nargs=1, \
+                        help='Train the model, specify the filename')
+    parser.add_argument('--chat', \
+                        action='store_true', \
+                         help='Interact with the bot, using stdin')
+
+    if len(sys.argv) == 1:
+        parser.print_help(sys.stderr)
+        sys.exit(1)
+    try:
+        args = parser.parse_args()
+    except:
+        sys.exit(1)
+    
+    if filename:=args.train:
+        from chatbot.train import main
+        filename = filename[0]
+        if os.path.isfile(filename):
+            main(filename)
+        else:
+            sys.stderr.write(f"Couldn't find a file named '{filename}' \n")
+    
+    if args.chat:
+        from chatbot.chat import cmd_main
+        cmd_main()
+
+    sys.exit(0)
