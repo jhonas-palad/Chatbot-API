@@ -11,3 +11,4 @@ starlette==0.20.4
 tqdm==4.64.1
 typing_extensions==4.4.0
 uvicorn==0.18.3
+websockets

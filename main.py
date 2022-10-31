@@ -32,6 +32,6 @@ async def websocket_endpoint(websocket: WebSocket = WebSocket):
 api = FastAPI()
 api.include_router(chat)
 
-@api.route('/')
+@api.get('/')
 async def home():
     return {"success": "hello"}
