@@ -37,6 +37,10 @@ async def websocket_endpoint(websocket: WebSocket = WebSocket):
 api = FastAPI()
 api.include_router(chat)
 
+@api.get('/')
+def home():
+    return {'hello': 'world'}
+
 if __name__ == '__main__':
     
     if os.environ.get('APP_ENV') == 'development':
