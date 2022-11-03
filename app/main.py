@@ -1,6 +1,6 @@
 from fastapi import APIRouter, FastAPI, WebSocket, WebSocketDisconnect
 
-from connection import ConnectionManager
+from .connection import ConnectionManager
 
 import uvicorn
 import os
