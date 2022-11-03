@@ -7,7 +7,7 @@ import os
 
 from dotenv import load_dotenv
 
-from chatbot import cb
+from .chatbot import cb
 
 load_dotenv()
 
