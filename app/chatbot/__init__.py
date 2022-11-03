@@ -1,4 +1,4 @@
-from chat import chatbot as cb
+from .chat import chatbot as cb
 
 
 

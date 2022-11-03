@@ -1,5 +1,5 @@
 from typing import List
-from utils import load_json
+from .utils import load_json
 
 import random
 import sys
