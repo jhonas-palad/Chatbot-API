@@ -1,13 +1,13 @@
 from fastapi import APIRouter, FastAPI, WebSocket, WebSocketDisconnect
 
-from .connection import ConnectionManager
+from connection import ConnectionManager
 
 import uvicorn
 import os
 
 from dotenv import load_dotenv
 
-from .chatbot import cb
+from chatbot import cb
 
 load_dotenv()
 

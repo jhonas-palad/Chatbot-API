@@ -3,8 +3,8 @@ import torch.nn as nn
 
 import numpy as np
 
-from .utils import stem, tokenize, bag_of_words, named_tuple_from_dict
-from .response_tag import response
+from utils import stem, tokenize, bag_of_words, named_tuple_from_dict
+from response_tag import response
 
 import os
 

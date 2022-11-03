@@ -1,4 +1,4 @@
-from .model import ChatBot
+from model import ChatBot
 
 chatbot = ChatBot.start_bot()
 
