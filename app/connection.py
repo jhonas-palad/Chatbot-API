@@ -8,12 +8,13 @@ class ConnectionManager:
         Create a list of active connections
         """
         self.active_connections: List[WebSocket] = []
-    
     async def connect(self, websocket: WebSocket):
         """
         Accept a WebSocket instance and append it to
         the list of active connections
         """
+        for k,v in websocket.__dict__.items():
+            print(f"{k}: {v}")
         await websocket.accept()
         self.active_connections.append(websocket)
 
