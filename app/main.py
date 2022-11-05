@@ -30,7 +30,7 @@ async def websocket_endpoint(websocket: WebSocket = WebSocket):
             data = await websocket.receive_text()
             data = cb.get_response(data)
             await manager.send_message({"data": data}, websocket)
-    except WebSocketDisconnect:
+    except WebSocketDisconnect as e:
         manager.disconnect(websocket)
 
 
