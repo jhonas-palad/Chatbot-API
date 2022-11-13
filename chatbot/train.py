@@ -88,24 +88,24 @@ class Trainer:
     @property
     def device(self):
         return self._device
-    def train_model(self, intents_pth, **kwargs):
-        if not isinstance(intents_pth, str):
-            raise ValueError(
-                f"intents_pth expected to be instance of {str.__name__}, "
-                f"got type {intents_pth.__class__.__name__} instance"
-                )
+    def train_model(self, _intents, **kwargs):
+        # if not isinstance(intents_pth, str):
+        #     raise ValueError(
+        #         f"intents_pth expected to be instance of {str.__name__}, "
+        #         f"got type {intents_pth.__class__.__name__} instance"
+        #         )
 
-        if not intents_pth.endswith('.json') or not (isfile:= os.path.isfile(intents_pth)):
-            if not isfile:
-                raise ValueError(
-                f"{intents_pth} could not be found"
-            )
-            else:
-                raise ValueError(
-                    f"intents_pth expected to be a json file format, got {intents_pth}"
-                )
-        _intents = utils.load_json(intents_pth)
-
+        # if not intents_pth.endswith('.json') or not (isfile:= os.path.isfile(intents_pth)):
+        #     if not isfile:
+        #         raise ValueError(
+        #         f"{intents_pth} could not be found"
+        #     )
+        #     else:
+        #         raise ValueError(
+        #             f"intents_pth expected to be a json file format, got {intents_pth}"
+        #         )
+        # _intents = utils.load_json(intents_pth)
+        
         dataset = self.dataset_cls(_intents)
 
         setattr(self.chatbot, 'dataset', dataset)
@@ -125,8 +125,8 @@ class Trainer:
 
         self._run_epoch(num_epochs, model)
 
-        filename = kwargs.pop('bot_filename', "TDBOT.model")
-        self.save_model_data(filename)
+        filename = kwargs.pop('bot_filename', "chatbot/model.pth")
+        self.save_model_data(_intents, filename)
         sys.stdout.write(f"Trained data, saved to {filename}\n")
 
     def _run_epoch(self, n_epochs, model):
@@ -150,9 +150,9 @@ class Trainer:
             if not ((epoch + 1) % 100):
                 print(f"epoch {epoch + 1} / {n_epochs}, loss = {loss.item():.4f}")
     
-    def save_model_data(self, filename = './TDBOT.model'):
+    def save_model_data(self,intents ,save_filename = 'chatbot/model.pth', ):
 
-        self.chatbot.save_instance(filename)
+        self.chatbot.save_instance(intents, save_filename)
 
     def create_dsloader(self, **kwargs):
         if not hasattr(self.chatbot, 'dataset'):
@@ -165,7 +165,7 @@ class Trainer:
 
         self.dataloader_ins = dataloader
 
-def main(filename):
+def train(filename):
     chatbot = ChatBot('MyBot')
     trainer = Trainer(chatbot)
     

@@ -7,6 +7,7 @@ from .utils import stem, tokenize, bag_of_words, named_tuple_from_dict
 from .response_tag import response
 
 import os
+import random
 
 import logging
 logging.basicConfig(level=logging.DEBUG)
@@ -60,6 +61,12 @@ class NeuralNet(nn.Module):
         return index.item(), probability.item()
 
 
+UNKNOWN_RESPONSES = [
+    "Sorry, I didn't get that.",
+    "I applogize, I can't understand the query",
+    "I'm having hard time to understand your question"
+]
+
 class ChatBot:
     def __init__(self, name = 'Bot', nn_model_cls = NeuralNet):
         self.name = name
@@ -77,7 +84,7 @@ class ChatBot:
         self.nn_model = nn_instance
         return nn_instance
 
-    def save_instance(self, filename):
+    def save_instance(self, intents, save_filename):
         data = {
             'name': self.name,
             'state': self.nn_model.state_dict(),
@@ -86,15 +93,23 @@ class ChatBot:
             'Z3_units': self.nn_model.output_layer_size,
             'word_collection': self.dataset.word_collection,
             'tags': self.dataset.tags,
+            'intents': intents
         }
 
-        torch.save(data, filename)
+        torch.save(data, save_filename)
     def load_instance(self, filename):
         trained_data: dict = torch.load(filename)
         if not isinstance(trained_data, dict):
             raise ChatbotExc("Trained dataset must be saved as form of mapping.")
         return named_tuple_from_dict('TrainedData', **trained_data)
-         
+    def prepare_intents(self, intents):
+        intent_dict = {}
+        for intent in intents:
+            intent_dict[intent['tag']] = {
+                'responses': intent['responses'],
+                'follow_up_responses': intent['follow_up_responses']
+            }
+        self.intents = intent_dict
     @classmethod
     def start_bot(cls, FILE = 'chatbot/model.pth'):
         self = cls()
@@ -102,11 +117,12 @@ class ChatBot:
         logging.debug(f"{os.getcwd()}, {cls.start_bot} param FILE = {FILE}")
         trained_ds = self.load_instance(FILE)
 
-        
         setattr(self, 'name', trained_ds.name)
         #Cache these objects, to be used in get_response
         setattr(self, 'word_collection', trained_ds.word_collection)
         setattr(self, 'tags', trained_ds.tags)
+
+        self.prepare_intents(trained_ds.intents)
 
         nn_instance = self.create_nn_ins( input_layer_size = trained_ds.Z1_units, \
                                         hidden_layer_size = trained_ds.Z2_units, \
@@ -131,9 +147,19 @@ class ChatBot:
     def generate_response(self, output, threshold):
         tag_index, probability = self.nn_model.predict(output)
         tag = self.tags[tag_index]
+
         if probability < threshold:
-            return "I'm sorry didn't understand that"
-        return response.get_response_for_tag(tag)
+            response = UNKNOWN_RESPONSES
+            follow_up_responses = []
+        else:
+            response = self.intents[tag]['responses']
+            follow_up_responses = self.intents[tag]['follow_up_responses']
+        response = {
+            'response': random.choice(response),
+            'follow_up_reponses': follow_up_responses
+        }
+
+        return response
 
 class ChatbotExc(Exception):
     pass

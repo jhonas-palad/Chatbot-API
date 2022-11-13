@@ -1,21 +1,14 @@
-from fastapi import APIRouter, FastAPI, WebSocket, WebSocketDisconnect
+from fastapi import APIRouter, WebSocketDisconnect, WebSocket
 
 from connection import ConnectionManager
 
-import uvicorn
-import os
-
-from dotenv import load_dotenv
-
 from chatbot import cb
 
-load_dotenv()
-
-chat = APIRouter()
+router = APIRouter()
 
 manager = ConnectionManager()
 
-@chat.websocket("/chat")
+@router.websocket("/")
 async def websocket_endpoint(websocket: WebSocket = WebSocket):
     """
     Will open a WebSocket to send messages between client and server.
@@ -26,25 +19,9 @@ async def websocket_endpoint(websocket: WebSocket = WebSocket):
     """
     await manager.connect(websocket)
     try:
-        manager.send_response({"hello": "world"})
         while True:
             data = await websocket.receive_text()
             data = cb.get_response(data)
-            await manager.send_response({"data": data}, websocket)
+            await manager.send_response(data, websocket)
     except WebSocketDisconnect as e:
         manager.disconnect(websocket)
-
-
-api = FastAPI()
-api.include_router(chat)
-
-@api.get('/')
-def home():
-    return {'hello': 'world'}
-
-if __name__ == '__main__':
-    
-    if os.environ.get('APP_ENV') == 'development':
-        uvicorn.run("main:api", reload=True)
-    else:
-        uvicorn.run("main:api")
