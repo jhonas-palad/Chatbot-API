@@ -165,7 +165,16 @@ class Trainer:
 
         self.dataloader_ins = dataloader
 
-def train(filename):
+def train_from_db(intents):
+    chatbot = ChatBot('MyBot')
+    trainer = Trainer(chatbot)
+    
+    trainer.train_model(intents, num_epochs = 1000)
+    print(f"Training complete")
+    # intents = utils.load_json('intents.json')
+    # intents = IntentDataset(intents)
+
+def train_from_doc(filename):
     chatbot = ChatBot('MyBot')
     trainer = Trainer(chatbot)
     

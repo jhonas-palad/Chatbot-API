@@ -2,7 +2,7 @@ from fastapi import APIRouter
 
 from database.database import *
 from models.intent import *
-from chatbot.train import train
+from chatbot.train import train_from_db
 router = APIRouter()
 
 
@@ -78,7 +78,7 @@ async def delete_intent_data(id: str):
 async def train_bot():
     intents = await retrieve_intents()
     dict_intents = [intent.dict() for intent in intents]
-    train(dict_intents)
+    train_from_db(dict_intents)
     return {
         "status_code": 200,
         "response_type": "success",
