@@ -105,5 +105,29 @@
             "Currently enrolled students are not required to undergo the clearance procedure.",
             "The Registrar's office will only issue client's request once the alumni/former students of Batangas and Lipa campuses are cleared of all obligations as seen on the Student Clearance System"
         ]
-    }
+    },
+    {
+        "tag": "courses_offered",
+        "patterns": [
+          "Courses list",
+          "Courses offered",
+          "What are the courses offered?",
+          "Offered courses",
+          "List of courses offered",
+          "List of courses"
+        ],
+        "responses": [
+          "University of Batangas Lipa City Campus offers the following programs"
+        ],
+        "follow_up_responses": [
+      "COLLEGE OF CRIMINAL JUSTICE EDUCATION (CCJE):\n-Bachelor of Science in Criminology",
+      "COLLEGE OF EDUCATION, ARTS & SCIENCES (CEAS):\n-Bachelor of Science in Psychology\n- Bachelor of Science in Legal Management\n- Teacher Education Programs\n- Bachelor of Elementary Education\n- Bachelor of Secondary Education\n- Bachelor of Science in Social Work",
+          "COLLEGE OF INFORMATION TECHNOLOGY, ENTERTAINMENT AND COMMUNICATION (CITEC):\n- Bachelor of Science in Information Technology\n- Bachelor of Arts in Multi-Media Arts",
+          "COLLEGE OF ENGINEERING AND ARCHITECTURE (CENAR):\n- Bachelor of Science in Industrial Engineering\n- Bachelor of Science in Computer Engineering\n- Bachelor of Science in Architecture",
+          "COLLEGE OF BUSINESS, ACCOUNTANCY AND AUDITING (CBAA):\n- Bachelor of Science in Business Administration\n- Bachelor of Science in Accountancy",
+          "COLLEGE OF ENTREPRENEURSHIP, TOURISM, HOSPITALITY AND REAL ESTATE MANAGEMENT (CENTHRE):\n- Bachelor of Science in Entrepreneurship\n- Bachelor of Science in Tourism Management\n- Bachelor of Science in International Hospitality Management\n- (Ladderized Curriculum)\n- Bachelor of Science in Real Estate Management",
+          "COLLEGE OF LAW:\n- Juris Doctor of Laws",
+          "GRADUATE SCHOOL PROGRAMS:\n- Master of Arts in Education\n- Major in Educational Administration\n- Major in English\n- Major in Filipino\n- Major in Social Sciences\n- Master in Business Management\n- Major in Business Administration\n- Major in Human Resource Management\n- Master in Public Administration"
+        ]
+      }
 ]

@@ -1,13 +1,14 @@
-from fastapi import APIRouter
-
-from database.database import *
+from fastapi import APIRouter, Depends
+from auth.token import decode_token
+from models.auth import TokenPayLoad
+from database.intent_database import *
 from models.intent import *
 from chatbot.train import train_from_db
 router = APIRouter()
 
 
 @router.get('/', response_description="Intents retrieved", response_model=IntentResponse)
-async def get_all_intents():
+async def get_all_intents(token: TokenPayLoad = Depends(decode_token)):
     intent = await retrieve_intents()
     return {
         "status_code": 200,
@@ -17,7 +18,7 @@ async def get_all_intents():
     }
 
 @router.get('/{id}', response_description="Intent data retrieved", response_model=IntentResponse)
-async def get_intent_data(id: str):
+async def get_intent_data(id: str, token: TokenPayLoad = Depends(decode_token)):
     try:
         id = PydanticObjectId(id)
     except Exception:
@@ -33,7 +34,7 @@ async def get_intent_data(id: str):
 
 
 @router.post("/", response_description="Intent data added into the database", response_model = IntentResponse)
-async def add_intent_data(intent: Intent):
+async def add_intent_data(intent: Intent,token: TokenPayLoad = Depends(decode_token)):
     new_intent = await add_intent(intent)
     return {
         "status_code": 200,
@@ -44,7 +45,7 @@ async def add_intent_data(intent: Intent):
 
 
 @router.put("/update/{id}", response_model=IntentResponse)
-async def update_intent_data(id: str, req: UpdateIntentModel):
+async def update_intent_data(id: str, req: UpdateIntentModel, token: TokenPayLoad = Depends(decode_token)):
     try:
         id = PydanticObjectId(id)
     except Exception:
@@ -59,7 +60,7 @@ async def update_intent_data(id: str, req: UpdateIntentModel):
     }
 
 @router.delete('/{id}', response_description="Intent data removed from the database")
-async def delete_intent_data(id: str):
+async def delete_intent_data(id: str, token: TokenPayLoad = Depends(decode_token)):
     try:
         id = PydanticObjectId(id)
     except Exception:
