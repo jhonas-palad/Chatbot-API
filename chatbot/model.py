@@ -156,7 +156,7 @@ class ChatBot:
             follow_up_responses = self.intents[tag]['follow_up_responses']
         response = {
             'response': random.choice(response),
-            'follow_up_reponses': follow_up_responses
+            'follow_up_responses': follow_up_responses
         }
 
         return response
