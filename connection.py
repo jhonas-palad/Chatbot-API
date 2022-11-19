@@ -13,11 +13,7 @@ class ConnectionManager:
         Accept a WebSocket instance and append it to
         the list of active connections
         """
-        for k,v in websocket.__dict__.items():
-            print(f"{k}: {v}")
         await websocket.accept()
-        for k,v in websocket.__dict__.items():
-            print(f"{k}: {v}")
         self.active_connections.append(websocket)
 
     def disconnect(self, websocket: WebSocket):

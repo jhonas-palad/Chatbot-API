@@ -8,7 +8,7 @@ router = APIRouter()
 
 manager = ConnectionManager()
 
-@router.websocket("/")
+@router.websocket("")
 async def websocket_endpoint(websocket: WebSocket = WebSocket):
     """
     Will open a WebSocket to send messages between client and server.
