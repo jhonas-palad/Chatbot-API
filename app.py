@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from config.config import initiate_database
 from routers.intent_router import router as IntentRouter
 from routers.chat_router import router as ChatRouter
@@ -18,6 +19,17 @@ app = FastAPI(
         "name": "Jhonas Emmanuel O. Palad",
         "email": "jhonasemmanuel@gmail.com"
     }
+
+)
+
+origins = ["*"]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 
 )
 
