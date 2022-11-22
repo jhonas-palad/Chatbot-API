@@ -12,6 +12,6 @@ class TokenPayLoad(BaseModel):
 
 class User(Document):
     full_name: str | None = None
-    email: str
+    secret_pass: str
+    username: str
     password: str
-

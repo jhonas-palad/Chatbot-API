@@ -22,6 +22,8 @@ class Settings(BaseSettings):
     JWT_SECRET_KEY: str
     JWT_REFRESH_SECRET_KEY: str
 
+    #User
+    SECRET_PASS:str
     class Config:
         env_file = './.env'
         orm_mode = True

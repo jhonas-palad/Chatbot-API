@@ -9,8 +9,6 @@ from .response_tag import response
 import os
 import random
 
-import logging
-logging.basicConfig(level=logging.DEBUG)
 
 class NeuralNet(nn.Module):
 
@@ -114,7 +112,6 @@ class ChatBot:
     def start_bot(cls, FILE = 'chatbot/model.pth'):
         self = cls()
 
-        logging.debug(f"{os.getcwd()}, {cls.start_bot} param FILE = {FILE}")
         trained_ds = self.load_instance(FILE)
 
         setattr(self, 'name', trained_ds.name)
