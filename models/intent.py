@@ -17,7 +17,7 @@ class UpdateIntentModel(BaseModel):
     follow_up_responses: Optional[List[str]]
 
 class IntentResponse(BaseModel):
-    status_code: int
+    status: int
     response_type: str
     description: str
     data: Optional[Any]

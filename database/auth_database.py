@@ -49,6 +49,9 @@ async def get_user_by_username(username: str) -> User:
     user = await user_collection.find_one(User.username == username)
     return user
 
+async def find_token_owner(jwt: str) -> User:
+    user = await user_collection.find_one(User.refresh_token == jwt)
+    return user
 
 async def authenticate_user(username: str, password: str) -> User | bool:
     user = await get_user_by_username(username)
@@ -69,4 +72,3 @@ async def authenticate_user(username: str, password: str) -> User | bool:
 async def check_unique(username: str) -> bool:
     user = await get_user_by_username(username)
     return not user
-

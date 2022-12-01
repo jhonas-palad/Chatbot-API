@@ -1,43 +1,51 @@
-from fastapi import APIRouter, Depends
-from auth.token import decode_token
+from fastapi import APIRouter, Depends, status
+from auth.token import decode_access_token
 from models.auth import TokenPayLoad
 from database.intent_database import *
 from models.intent import *
 from chatbot.train import train_from_db
+from exception.intent import IntentException
+
 router = APIRouter()
 
 
-@router.get('/', response_description="Intents retrieved", response_model=IntentResponse)
-async def get_all_intents(token: TokenPayLoad = Depends(decode_token)):
-    intent = await retrieve_intents()
+@router.get('/all', response_description="Intents retrieved", response_model=IntentResponse)
+async def get_all_intents(token: TokenPayLoad = Depends(decode_access_token)):
+    intents = await retrieve_intents()
     return {
-        "status_code": 200,
+        "status": 200,
         "response_type": "success",
         "description": "Intents data retrieve successfully",
-        "data": intent
+        "data": intents
     }
 
-@router.get('/{id}', response_description="Intent data retrieved", response_model=IntentResponse)
-async def get_intent_data(id: str, token: TokenPayLoad = Depends(decode_token)):
+@router.get('/get/{id}', response_description="Intent data retrieved", response_model=IntentResponse)
+async def get_intent_data(id: str, token: TokenPayLoad = Depends(decode_access_token)):
     try:
         id = PydanticObjectId(id)
     except Exception:
         intent = None
     else:
         intent = await retrieve_intent(id)
+    if not intent:
+        raise IntentException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Intent doesn't exist"
+        )
+
     return {
-        "status_code": 200 if intent else 404,
-        "response_type": "success" if intent else "error",
-        "description": "Intent retrieved successfully" if intent else "Intent doesn't exist",
+        "status": 200,
+        "response_type": "success",
+        "description": "Intent retrieved successfully",
         "data": intent
     }
 
 
-@router.post("/", response_description="Intent data added into the database", response_model = IntentResponse)
-async def add_intent_data(intent: Intent,token: TokenPayLoad = Depends(decode_token)):
+@router.post("/create", response_description="Intent data added into the database", response_model = IntentResponse)
+async def add_intent_data(intent: Intent,token: TokenPayLoad = Depends(decode_access_token)):
     new_intent = await add_intent(intent)
     return {
-        "status_code": 200,
+        "status": 200,
         "response_type": "success",
         "description": "Intents data saved successfully",
         "data": new_intent
@@ -45,33 +53,42 @@ async def add_intent_data(intent: Intent,token: TokenPayLoad = Depends(decode_to
 
 
 @router.put("/update/{id}", response_model=IntentResponse)
-async def update_intent_data(id: str, req: UpdateIntentModel, token: TokenPayLoad = Depends(decode_token)):
+async def update_intent_data(id: str, req: UpdateIntentModel, token: TokenPayLoad = Depends(decode_access_token)):
     try:
         id = PydanticObjectId(id)
     except Exception:
         updated_intent = None
     else:
         updated_intent = await update_intent(id, req.dict())
+    if not updated_intent:
+        raise IntentException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Intent doesn't exist"
+        )
     return {
-        "status_code": 200 if updated_intent else 404,
-        "response_type": "success" if updated_intent else "error",
-        "description": f"Intent with ID:{id} updated successfully" if updated_intent else f"An error occurred. Intent with ID:{id} not found.",
+        "status": 200,
+        "response_type": "success",
+        "description": f"Intent with ID:{id} updated successfully",
         "data": updated_intent
     }
 
-@router.delete('/{id}', response_description="Intent data removed from the database")
-async def delete_intent_data(id: str, token: TokenPayLoad = Depends(decode_token)):
+@router.delete('/delete/{id}', response_description="Intent data removed from the database")
+async def delete_intent_data(id: str, token: TokenPayLoad = Depends(decode_access_token)):
     try:
         id = PydanticObjectId(id)
     except Exception:
         deleted_intent = False
     else:
         deleted_intent = await delete_intent(id)
-
+    if not deleted_intent:
+        raise IntentException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Intent doesn't exist"
+        )
     return {
-        "status_code": 200 if deleted_intent else 404,
-        "response_type": "success" if deleted_intent else "error",
-        "description": f"Intent with ID:{id} deleted successfully" if deleted_intent else f"An error occurred. Intent with ID:{id} not found.",
+        "status": 200,
+        "response_type": "success",
+        "description": f"Intent with ID:{id} deleted successfully",
         "data": deleted_intent
     }
 
@@ -81,7 +98,7 @@ async def train_bot():
     dict_intents = [intent.dict() for intent in intents]
     train_from_db(dict_intents)
     return {
-        "status_code": 200,
+        "status": 200,
         "response_type": "success",
         "description": "Bot trained successfully",
         "data": intents

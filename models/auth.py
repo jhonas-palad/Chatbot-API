@@ -7,11 +7,13 @@ class Token(BaseModel):
     token_type: str
 
 class TokenPayLoad(BaseModel):
-    data: Any = None
+    sub: Any = None
+    username: Any = None
     exp: int = None
 
 class User(Document):
     full_name: str | None = None
     secret_pass: str
+    refresh_token: str | None = None
     username: str
     password: str

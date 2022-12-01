@@ -27,7 +27,7 @@ async def delete_intent(id: PydanticObjectId) -> bool:
     return False
 
 async def update_intent(id: PydanticObjectId, data: dict) -> Union[bool, Intent]:
-    body = {k: v for k, v in data.items() if v is not None}\
+    body = {k: v for k, v in data.items() if v is not None}
 
     update_query = {
         "$set": {
