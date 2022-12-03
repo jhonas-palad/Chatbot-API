@@ -1,8 +1,9 @@
 from fastapi import APIRouter, WebSocketDisconnect, WebSocket
-
+from database.chatbot_model import fetch_model_states
+from database.intent_database import retrieve_intents
 from connection import ConnectionManager
 
-from chatbot import cb
+from chatbot import init_bot
 
 router = APIRouter()
 
@@ -17,6 +18,9 @@ async def websocket_endpoint(websocket: WebSocket = WebSocket):
     messages sent by the client with websocket.recieve_text and send back
     a response
     """
+    all_intents = await retrieve_intents()
+    model_state = await fetch_model_states()
+    cb = init_bot(model_state, all_intents)
     await manager.connect(websocket)
     try:
         while True:

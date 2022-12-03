@@ -143,7 +143,6 @@ async def handle_refresh_token(jwt: str | None = Cookie(None)):
         payload = _jwt.decode(jwt, settings.JWT_REFRESH_SECRET_KEY, algorithms=[settings.ALGORITHM])
         if payload['sub'] != str(found_user.id):
             raise JWTError("User ID doesn't match")
-        print(f"REFRESH PAYLOAD: {payload}" )
 
     except JWTError as e:
         print(e)

@@ -89,22 +89,6 @@ class Trainer:
     def device(self):
         return self._device
     def train_model(self, _intents, **kwargs):
-        # if not isinstance(intents_pth, str):
-        #     raise ValueError(
-        #         f"intents_pth expected to be instance of {str.__name__}, "
-        #         f"got type {intents_pth.__class__.__name__} instance"
-        #         )
-
-        # if not intents_pth.endswith('.json') or not (isfile:= os.path.isfile(intents_pth)):
-        #     if not isfile:
-        #         raise ValueError(
-        #         f"{intents_pth} could not be found"
-        #     )
-        #     else:
-        #         raise ValueError(
-        #             f"intents_pth expected to be a json file format, got {intents_pth}"
-        #         )
-        # _intents = utils.load_json(intents_pth)
         
         dataset = self.dataset_cls(_intents)
 
@@ -113,7 +97,6 @@ class Trainer:
         hidden_size = kwargs.pop('hidden_size', 8)
         output_size = len(dataset.tags)
         input_size = len(dataset.word_collection)
-
         self.create_dsloader(batch_size = output_size, shuffle=True)
 
         num_epochs = kwargs.pop('num_epochs', 1000)
@@ -124,10 +107,18 @@ class Trainer:
                                          output_layer_size = output_size) \
 
         self._run_epoch(num_epochs, model)
+        
+        return {
+            'model_state': model.state_dict(),
+            'model_init_params': {
+                'input_layer_size': input_size,
+                'hidden_layer_size': hidden_size,
+                'output_layer_size': output_size
+            },
+            'word_collection': dataset.word_collection,
+            'tags': dataset.tags
+        }
 
-        filename = kwargs.pop('bot_filename', "chatbot/model.pth")
-        self.save_model_data(_intents, filename)
-        sys.stdout.write(f"Trained data, saved to {filename}\n")
 
     def _run_epoch(self, n_epochs, model):
         criterion = nn.CrossEntropyLoss()
@@ -169,8 +160,10 @@ def train_from_db(intents):
     chatbot = ChatBot('MyBot')
     trainer = Trainer(chatbot)
     
-    trainer.train_model(intents, num_epochs = 1000)
+    data = trainer.train_model(intents, num_epochs = 1000)
+
     print(f"Training complete")
+    return data
     # intents = utils.load_json('intents.json')
     # intents = IntentDataset(intents)
 

@@ -12,20 +12,6 @@ from collections import namedtuple
 
 stemmer = PorterStemmer()
 
-#Use namedtupple instead, but i'll leave it here
-# class ROData:
-#     def __init__(self, **data):
-#         super().__setattr__('data', data)
-#     def __getattr__(self, __key) -> Any:
-#         if __key not in self.data:
-#             raise AttributeError(f"{__key} is does not exists in data information set.")
-#         data = super().__getattribute__('data')
-#         return data[__key]
-#     def __setattr__(self, __name: str, __value: Any) -> None:
-#         raise AttributeError("It is not possible to  modify the values of this instance.")
-
-
-
 def tokenize(sentence):
     """
     Yield tokenized words in a sequence using word_tokenize

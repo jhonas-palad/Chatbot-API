@@ -15,20 +15,6 @@ class NeuralNet(nn.Module):
     def __init__(self,*,input_layer_size, hidden_layer_size, output_layer_size):
         
         super().__init__()
-        
-        if not isinstance(input_layer_size, int):
-            raise ValueError(f"{self.__class__.__name__}.__init__ argument input_layer_size " \
-                             f"expected to be instance of type {int.__name__}, got instance of {input_layer_size.__class__.__name__}.")
-
-        if not isinstance(hidden_layer_size, int):
-            raise ValueError(f"{self.__class__.__name__}.__init__ argument hidden_layer_size " \
-                             f"expected to be instance of type {int.__name__}, got instance of {hidden_layer_size.__class__.__name__}.")
-        
-        if not isinstance(output_layer_size, int):
-            raise ValueError(f"{self.__class__.__name__}.__init__ argument output_layer_size " \
-                             f"expected to be instance of type {int.__name__}, got instance of {output_layer_size.__class__.__name__}.")
-
-
         self.input_layer_size = input_layer_size
         self.hidden_layer_size = hidden_layer_size
         self.output_layer_size = output_layer_size
@@ -36,7 +22,6 @@ class NeuralNet(nn.Module):
         self.Z1 = nn.Linear(input_layer_size, hidden_layer_size)
         self.Z2 = nn.Linear(hidden_layer_size, hidden_layer_size)
         self.Z3 = nn.Linear(hidden_layer_size, output_layer_size)
-        
 
         self.activation = nn.ReLU()
 
@@ -47,6 +32,7 @@ class NeuralNet(nn.Module):
         out = self.Z2(out)
         out = self.activation(out)
         out = self.Z3(out)
+
 
         return out
     def predict(self, x):
@@ -82,24 +68,6 @@ class ChatBot:
         self.nn_model = nn_instance
         return nn_instance
 
-    def save_instance(self, intents, save_filename):
-        data = {
-            'name': self.name,
-            'state': self.nn_model.state_dict(),
-            'Z1_units': self.nn_model.input_layer_size,
-            'Z2_units': self.nn_model.hidden_layer_size,
-            'Z3_units': self.nn_model.output_layer_size,
-            'word_collection': self.dataset.word_collection,
-            'tags': self.dataset.tags,
-            'intents': intents
-        }
-
-        torch.save(data, save_filename)
-    def load_instance(self, filename):
-        trained_data: dict = torch.load(filename)
-        if not isinstance(trained_data, dict):
-            raise ChatbotExc("Trained dataset must be saved as form of mapping.")
-        return named_tuple_from_dict('TrainedData', **trained_data)
     def prepare_intents(self, intents):
         intent_dict = {}
         for intent in intents:
@@ -109,30 +77,27 @@ class ChatBot:
             }
         self.intents = intent_dict
     @classmethod
-    def start_bot(cls, FILE = 'chatbot/model.pth'):
+    def start_bot(cls,model_state, all_intents):
         self = cls()
+        
+        intent_list = [intent.dict() for intent in all_intents]
+        self.prepare_intents(intent_list)
+        self.word_collection = model_state['word_collection']
+        self.tags = model_state['tags']
+        nn_instance = self.create_nn_ins( 
+            **model_state['model_init_params']
+        )
 
-        trained_ds = self.load_instance(FILE)
-
-        setattr(self, 'name', trained_ds.name)
-        #Cache these objects, to be used in get_response
-        setattr(self, 'word_collection', trained_ds.word_collection)
-        setattr(self, 'tags', trained_ds.tags)
-
-        self.prepare_intents(trained_ds.intents)
-
-        nn_instance = self.create_nn_ins( input_layer_size = trained_ds.Z1_units, \
-                                        hidden_layer_size = trained_ds.Z2_units, \
-                                        output_layer_size = trained_ds.Z3_units)
-
-        nn_instance.load_state_dict(trained_ds.state)
+        nn_instance.load_state_dict(model_state['model_state'])
         nn_instance.eval()
         return self
 
     def clean_query(self, query: str) -> str:
+        
         gen_query = tokenize(query)
         tok_query = [stem(word) for word in gen_query]
         result = bag_of_words(tok_query, self.word_collection)
+        print(f'query: {query} gen_query={gen_query} tok_query={tok_query} res {result}')
         return result.reshape(1, result.shape[0])
 
     def get_response(self, query, threshold = .75):
@@ -144,7 +109,7 @@ class ChatBot:
     def generate_response(self, output, threshold):
         tag_index, probability = self.nn_model.predict(output)
         tag = self.tags[tag_index]
-
+        print(tag_index, probability, tag)
         if probability < threshold:
             response = UNKNOWN_RESPONSES
             follow_up_responses = []

@@ -3,7 +3,6 @@ from beanie import PydanticObjectId
 
 from models.intent import Intent
 
-
 intent_collection = Intent
 
 async def add_intent(new_intent: Intent) -> Intent:
@@ -39,6 +38,5 @@ async def update_intent(id: PydanticObjectId, data: dict) -> Union[bool, Intent]
         await intent.update(update_query)
         return intent
     return False
-
 
 

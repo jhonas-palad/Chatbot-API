@@ -18,7 +18,7 @@
         ]
     },
     {
-        "tag": "verbs",
+        "tag": "verb",
         "patterns": [
             "how",
             "what",

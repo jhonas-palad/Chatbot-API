@@ -1,9 +1,7 @@
 from .model import ChatBot
 
-chatbot = ChatBot.start_bot()
-
-
 def cmd_main():
+    chatbot = ChatBot.start_bot()
     while True:
         query = input(f'{chatbot.name}: ')
 
@@ -12,3 +10,5 @@ def cmd_main():
 
         response = chatbot.get_response(query)
         print(response)
+def init_bot(model_state, all_intents):
+    return ChatBot.start_bot(model_state, all_intents)

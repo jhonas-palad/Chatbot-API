@@ -1,11 +1,11 @@
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, status, WebSocketDisconnect, WebSocket
 from auth.token import decode_access_token
 from models.auth import TokenPayLoad
 from database.intent_database import *
 from models.intent import *
 from chatbot.train import train_from_db
 from exception.intent import IntentException
-
+from database.chatbot_model import *
 router = APIRouter()
 
 
@@ -93,13 +93,14 @@ async def delete_intent_data(id: str, token: TokenPayLoad = Depends(decode_acces
     }
 
 @router.post('/train_bot', response_description="Train the chatbot model")
-async def train_bot():
+async def train_bot(token: TokenPayLoad = Depends(decode_access_token)):
     intents = await retrieve_intents()
     dict_intents = [intent.dict() for intent in intents]
-    train_from_db(dict_intents)
+    chatbot_data_state = train_from_db(dict_intents)
+    await save_model_state(chatbot_data_state)
     return {
         "status": 200,
         "response_type": "success",
         "description": "Bot trained successfully",
-        "data": intents
+        "data": True
     }

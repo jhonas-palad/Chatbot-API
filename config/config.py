@@ -6,6 +6,7 @@ from motor.motor_asyncio import AsyncIOMotorClient
 
 from models.intent import Intent
 from models.auth import User
+from models.chatbot_state import ModelState
 
 class SettingsNotConfigured(Exception):
     pass
@@ -35,6 +36,6 @@ async def initiate_database():
     if not settings.DATABASE_URL:
         raise SettingsNotConfigured(f"Please add DATABASE_URL before starting the app")
     client = AsyncIOMotorClient(settings.DATABASE_URL)
-    await init_beanie(database = client.chatbot_asketty, document_models=[Intent, User])
+    await init_beanie(database = client.chatbot_asketty, document_models=[Intent, User, ModelState])
 
 
