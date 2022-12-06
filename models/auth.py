@@ -5,7 +5,8 @@ from typing import Any
 class Token(BaseModel):
     access_token: str
     token_type: str
-
+    full_name: str | None = None
+    
 class TokenPayLoad(BaseModel):
     sub: Any = None
     username: Any = None

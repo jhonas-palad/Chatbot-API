@@ -9,8 +9,7 @@ from config.config import settings
 
 router = APIRouter()
 
-#TODO
-#Remove print statements
+
 @router.post("/login", response_model = Token)
 async def login_user(response: Response, form_data: OAuth2PasswordRequestForm = Depends()):
 
@@ -45,9 +44,9 @@ async def login_user(response: Response, form_data: OAuth2PasswordRequestForm = 
         httponly=True,
         samesite='none'
     )
-
     return {
         "access_token": access_token,
+        "full_name": user.full_name,
         "token_type": "bearer"
     }
 
@@ -75,8 +74,7 @@ async def logout_user(response: Response, jwt: str | None = Cookie(None)):
     
     #Automatically returns None
 
-#TODO
-# Add response model
+
 @router.post("/register")
 async def add_user(user: User):
     invalid_fields_description = {}
@@ -115,11 +113,8 @@ async def add_user(user: User):
         'data': new_user
     }
 
-#TODO
-#Remove print statements
 @router.get('/refresh', response_model=Token)
 async def handle_refresh_token(jwt: str | None = Cookie(None)):
-    print(f"JWT: {jwt}")
     if not jwt:
         raise AuthException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -145,7 +140,6 @@ async def handle_refresh_token(jwt: str | None = Cookie(None)):
             raise JWTError("User ID doesn't match")
 
     except JWTError as e:
-        print(e)
         raise AuthException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Token is not secured",
@@ -160,6 +154,7 @@ async def handle_refresh_token(jwt: str | None = Cookie(None)):
 
     return {
         "access_token": access_token,
+        "full_name": found_user.full_name,
         "token_type": "bearer"
     }
     
