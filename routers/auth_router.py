@@ -41,7 +41,7 @@ async def login_user(response: Response, form_data: OAuth2PasswordRequestForm = 
         refresh_token,
         max_age= 24 * 60 * 60 * 1000,
         domain='http://139.162.105.247',
-        secure=True,
+        secure=False,
         httponly=True,
         samesite='none'
     )
