@@ -1,4 +1,4 @@
-## Chatbot API impelmented using Python FastAPI framework and PyTorch
+## Chatbot API implemented using Python FastAPI framework and PyTorch
 
 All intents and model state are stored in MongoDB.
 
