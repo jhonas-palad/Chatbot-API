@@ -114,7 +114,7 @@ class ChatBot:
         lower_orig_query = orig_query.lower()
         print(tag_index, probability, tag)
         found_entity = []
-        
+        unknown_flag = False
         try:
             entities = self.intents[tag]['entities']
         except KeyError:
