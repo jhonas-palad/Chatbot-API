@@ -1,15 +1,14 @@
 from typing import List, Union
 from beanie import PydanticObjectId
-
-from models.intent import Intent
+from models.intent import Intent, IntentDev
 
 intent_collection = Intent
 
-async def add_intent(new_intent: Intent) -> Intent:
+async def add_intent(new_intent: Intent | IntentDev) -> Intent:
     intent = await new_intent.create()
     return intent
 
-async def retrieve_intents() -> List[Intent]:
+async def retrieve_intents() -> List[Intent | IntentDev]:
     intent = await intent_collection.all().to_list()
     return intent
 

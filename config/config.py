@@ -4,18 +4,18 @@ from typing import Optional
 from beanie import init_beanie
 from motor.motor_asyncio import AsyncIOMotorClient
 
-from models.intent import Intent
+from models.intent import Intent, IntentDev
 from models.auth import User
 from models.chatbot_state import ModelState
+
 
 class SettingsNotConfigured(Exception):
     pass
 class Settings(BaseSettings):
     #Database env
     DATABASE_URL: Optional[str] = None
-    MONGO_INITDB_DATABASE: str
-    MONGO_INITDB_ROOT_PASSWORD: str
-    MONGO_INITDB_ROOT_USERNAME: str
+
+    DEV_MODE: int = 0
     #Token env
     ACCESS_TOKEN_EXPIRE_MINUTES: int
     REFRESH_TOKEN_EXPIRE_MINUTES: int
@@ -31,11 +31,12 @@ class Settings(BaseSettings):
 
 settings = Settings()
 
-async def initiate_database():
 
+async def initiate_database():
+    IntentModel = Intent if not settings.DEV_MODE else IntentDev
     if not settings.DATABASE_URL:
         raise SettingsNotConfigured(f"Please add DATABASE_URL before starting the app")
     client = AsyncIOMotorClient(settings.DATABASE_URL)
-    await init_beanie(database = client.chatbot_asketty, document_models=[Intent, User, ModelState])
+    await init_beanie(database = client.chatbot_asketty, document_models=[IntentModel, User, ModelState])
 
 

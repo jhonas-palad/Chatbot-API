@@ -1,12 +1,7 @@
 import torch
 import torch.nn as nn
 
-import numpy as np
-
-from .utils import stem, tokenize, bag_of_words, named_tuple_from_dict
-from .response_tag import response
-
-import os
+from .utils import stem, tokenize, bag_of_words
 import random
 
 
@@ -68,12 +63,18 @@ class ChatBot:
         self.nn_model = nn_instance
         return nn_instance
 
-    def prepare_intents(self, intents):
+    def prepare_intents(self, intents: list):
         intent_dict = {}
+
         for intent in intents:
+            responses = intent['responses']
+            entities = intent['entities']
             intent_dict[intent['tag']] = {
-                'responses': intent['responses'],
-                'follow_up_responses': intent['follow_up_responses']
+                'responses': responses,
+                'entities': { 
+                    entity['title']:
+                    dict(text=entity['text'])  for entity in entities
+                } or {}
             }
         self.intents = intent_dict
     @classmethod
@@ -101,25 +102,51 @@ class ChatBot:
         return result.reshape(1, result.shape[0])
 
     def get_response(self, query, threshold = .75):
+
         cleaned_query = self.clean_query(query)
         tensor_query = torch.from_numpy(cleaned_query)
-        return self.generate_response(tensor_query, threshold)
+        return self.generate_response(tensor_query, query, threshold)
 
 
-    def generate_response(self, output, threshold):
+    def generate_response(self, output, orig_query, threshold):
         tag_index, probability = self.nn_model.predict(output)
         tag = self.tags[tag_index]
+        lower_orig_query = orig_query.lower()
         print(tag_index, probability, tag)
+        found_entity = []
+        entities = self.intents[tag]['entities']
+        unknown_flag = False
         if probability < threshold:
-            response = UNKNOWN_RESPONSES
-            follow_up_responses = []
+            responses = UNKNOWN_RESPONSES
+            unknown_flag = True
         else:
-            response = self.intents[tag]['responses']
-            follow_up_responses = self.intents[tag]['follow_up_responses']
-        response = {
-            'response': random.choice(response),
-            'follow_up_responses': follow_up_responses
-        }
+            
+            entity_keys = list(entities.keys())
+            
+            for entity in entity_keys:
+                found = True if lower_orig_query.find(entity.lower()) >= 0 else False
+                if found :
+                    found_entity.append(entity)
+                print(entity)
+            responses = self.intents[tag]['responses']
+
+        if unknown_flag:
+            response = {
+                'text': [random.choice(responses)]
+            }
+        elif not found_entity:
+            response = {
+                'text': [random.choice(responses)],
+                'options': entities or {}
+            }
+        else :
+            text = []
+            for entry in found_entity:
+                text.append(entities[entry]['text'])
+            response = {
+                'text': text
+            }
+
 
         return response
 

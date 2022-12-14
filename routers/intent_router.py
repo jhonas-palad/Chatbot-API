@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, status, WebSocketDisconnect, WebSocket
+from fastapi import APIRouter, Depends, status
 from auth.token import decode_access_token
 from models.auth import TokenPayLoad
 from database.intent_database import *
@@ -7,7 +7,6 @@ from chatbot.train import train_from_db
 from exception.intent import IntentException
 from database.chatbot_model import *
 router = APIRouter()
-
 
 @router.get('/all', response_description="Intents retrieved", response_model=IntentResponse)
 async def get_all_intents(token: TokenPayLoad = Depends(decode_access_token)):
@@ -42,7 +41,7 @@ async def get_intent_data(id: str, token: TokenPayLoad = Depends(decode_access_t
 
 
 @router.post("/create", response_description="Intent data added into the database", response_model = IntentResponse)
-async def add_intent_data(intent: Intent,token: TokenPayLoad = Depends(decode_access_token)):
+async def add_intent_data(intent:Intent, token: TokenPayLoad = Depends(decode_access_token)):
     new_intent = await add_intent(intent)
     return {
         "status": 200,
@@ -53,7 +52,7 @@ async def add_intent_data(intent: Intent,token: TokenPayLoad = Depends(decode_ac
 
 
 @router.put("/update/{id}", response_model=IntentResponse)
-async def update_intent_data(id: str, req: UpdateIntentModel, token: TokenPayLoad = Depends(decode_access_token)):
+async def update_intent_data(id: str, req: UpdateIntent, token: TokenPayLoad = Depends(decode_access_token)):
     try:
         id = PydanticObjectId(id)
     except Exception:

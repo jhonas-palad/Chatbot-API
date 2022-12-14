@@ -1,0 +1,67 @@
+[
+    {
+        "tag": "Enrollment",
+        "patterns": [
+            "Enrollment",
+            "Enrollment procedure"
+        ],
+        "responses": [
+            "What type of enrollee are you?"
+        ],
+        "entities": [
+            {
+                "title": "College",
+                "value": "college",
+                "text": "College enrollment procedure"
+            },
+            {
+                "title": "Shifter",
+                "value": "shifter",
+                "text": "Shifter enrollment procedure"
+            }
+        ]
+    },
+    {
+        "tag": "Admission",
+        "patterns": [
+            "Admission Procedure",
+            "Admission"
+        ],
+        "responses": [
+            "What type of student are you?"
+        ],
+        "entities": [
+            {
+                "title": "College",
+                "value": "college",
+                "text": "College admission procedure ..."
+            },
+            {
+                "title": "Shifter",
+                "value": "shifter",
+                "text": "Shifter admission procedure ..."
+            }
+        ]
+    },
+    {
+        "tag": "Schedule",
+        "patterns": [
+            "Schedule"
+        ],
+        "responses": [
+            "What is your COURSE?"
+        ],
+        "entities": [
+            {
+                "title": "BSIT",
+                "value": "BSIT",
+                "text": "BSIT SCHEDULE"
+            },
+            {
+                "title": "BSIE",
+                "value": "BSIE",
+                "text": "BSIT SCHEDULE"
+            }
+        ]
+    }
+]
