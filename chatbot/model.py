@@ -114,13 +114,12 @@ class ChatBot:
         lower_orig_query = orig_query.lower()
         print(tag_index, probability, tag)
         found_entity = []
-        entities = self.intents[tag]['entities']
-        unknown_flag = False
-        if probability < threshold:
-            responses = UNKNOWN_RESPONSES
+        
+        try:
+            entities = self.intents[tag]['entities']
+        except KeyError:
             unknown_flag = True
         else:
-            
             entity_keys = list(entities.keys())
             
             for entity in entity_keys:
@@ -129,6 +128,9 @@ class ChatBot:
                     found_entity.append(entity)
                 print(entity)
             responses = self.intents[tag]['responses']
+            if probability < threshold:
+                responses = UNKNOWN_RESPONSES
+                unknown_flag = True
 
         if unknown_flag:
             response = {
