@@ -6,7 +6,7 @@ import torch
 import torch.nn as nn
 from torch.utils.data import Dataset as DS, DataLoader
 
-from .model import NeuralNet, ChatBot
+from .model import ChatBot
 
 import os
 import sys
@@ -160,7 +160,7 @@ def train_from_db(intents):
     chatbot = ChatBot('MyBot')
     trainer = Trainer(chatbot)
     
-    data = trainer.train_model(intents, num_epochs = 1000)
+    data = trainer.train_model(intents, num_epochs = 2000)
 
     print(f"Training complete")
     return data
