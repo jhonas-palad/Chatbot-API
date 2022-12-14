@@ -129,12 +129,12 @@ class ChatBot:
                 print(entity)
             responses = self.intents[tag]['responses']
             if probability < threshold:
-                responses = UNKNOWN_RESPONSES
-                unknown_flag = True
+                unknown_flag=True
+
 
         if unknown_flag:
             response = {
-                'text': [random.choice(responses)]
+                'text': [random.choice(UNKNOWN_RESPONSES)]
             }
         elif not found_entity:
             response = {
