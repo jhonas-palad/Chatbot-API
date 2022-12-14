@@ -4,7 +4,7 @@ from typing import Optional
 from beanie import init_beanie
 from motor.motor_asyncio import AsyncIOMotorClient
 
-from models.intent import Intent, IntentDev
+from models.intent import Intent
 from models.auth import User
 from models.chatbot_state import ModelState
 
@@ -33,10 +33,9 @@ settings = Settings()
 
 
 async def initiate_database():
-    IntentModel = Intent if not settings.DEV_MODE else IntentDev
     if not settings.DATABASE_URL:
         raise SettingsNotConfigured(f"Please add DATABASE_URL before starting the app")
     client = AsyncIOMotorClient(settings.DATABASE_URL)
-    await init_beanie(database = client.chatbot_asketty, document_models=[IntentModel, User, ModelState])
+    await init_beanie(database = client.chatbot_asketty, document_models=[Intent, User, ModelState])
 
 
