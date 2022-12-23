@@ -3,7 +3,7 @@ import torch.nn as nn
 
 from .utils import stem, tokenize, bag_of_words
 import random
-
+import numpy as np
 
 class NeuralNet(nn.Module):
 
@@ -27,9 +27,8 @@ class NeuralNet(nn.Module):
         out = self.Z2(out)
         out = self.activation(out)
         out = self.Z3(out)
-
-
         return out
+
     def predict(self, x):
         output = self.forward(x)
         #apply softmax activation function
@@ -45,6 +44,13 @@ UNKNOWN_RESPONSES = [
     "I applogize, I can't understand the query",
     "I'm having hard time to understand your question"
 ]
+
+def check_tensor(func):
+    def inner(ref, tensor, *args, **kwargs): 
+        if not torch.any(tensor):
+            kwargs['unknown_query'] = True
+        return func(ref, tensor, *args, **kwargs)
+    return inner
 
 class ChatBot:
     def __init__(self, name = 'Bot', nn_model_cls = NeuralNet):
@@ -98,7 +104,6 @@ class ChatBot:
         gen_query = tokenize(query)
         tok_query = [stem(word) for word in gen_query]
         result = bag_of_words(tok_query, self.word_collection)
-        print(f'query: {query} gen_query={gen_query} tok_query={tok_query} res {result}')
         return result.reshape(1, result.shape[0])
 
     def get_response(self, query, threshold = .75):
@@ -107,29 +112,31 @@ class ChatBot:
         tensor_query = torch.from_numpy(cleaned_query)
         return self.generate_response(tensor_query, query, threshold)
 
+    @check_tensor
+    def generate_response(self, output, orig_query, threshold, **kwargs):
+        unknown_flag = kwargs.pop('unknown_query', False)
 
-    def generate_response(self, output, orig_query, threshold):
-        tag_index, probability = self.nn_model.predict(output)
-        tag = self.tags[tag_index]
-        lower_orig_query = orig_query.lower()
-        print(tag_index, probability, tag)
-        found_entity = []
-        unknown_flag = False
-        try:
-            entities = self.intents[tag]['entities']
-        except KeyError:
-            unknown_flag = True
-        else:
-            entity_keys = list(entities.keys())
-            
-            for entity in entity_keys:
-                found = True if lower_orig_query.find(entity.lower()) >= 0 else False
-                if found :
-                    found_entity.append(entity)
-                print(entity)
-            responses = self.intents[tag]['responses']
-            if probability < threshold:
-                unknown_flag=True
+        if not unknown_flag:
+            tag_index, probability = self.nn_model.predict(output)
+            tag = self.tags[tag_index]
+            lower_orig_query = orig_query.lower()
+            print(tag_index, probability, tag)
+            found_entity = []
+            try:
+                entities = self.intents[tag]['entities']
+            except KeyError:
+                unknown_flag = True
+            else:
+                entity_keys = list(entities.keys())
+                
+                for entity in entity_keys:
+                    found = True if lower_orig_query.find(entity.lower()) >= 0 else False
+                    if found :
+                        found_entity.append(entity)
+                    print(entity)
+                responses = self.intents[tag]['responses']
+                if probability < threshold:
+                    unknown_flag=True
 
 
         if unknown_flag:

@@ -95,6 +95,7 @@ class Trainer:
         setattr(self.chatbot, 'dataset', dataset)
 
         hidden_size = kwargs.pop('hidden_size', 8)
+        print(hidden_size)
         output_size = len(dataset.tags)
         input_size = len(dataset.word_collection)
         self.create_dsloader(batch_size = output_size, shuffle=True)
@@ -137,10 +138,8 @@ class Trainer:
                 optimizer.zero_grad()
                 loss.backward()
                 optimizer.step()
-            
             if not ((epoch + 1) % 100):
                 print(f"epoch {epoch + 1} / {n_epochs}, loss = {loss.item():.4f}")
-    
     def save_model_data(self,intents ,save_filename = 'chatbot/model.pth', ):
 
         self.chatbot.save_instance(intents, save_filename)
@@ -160,7 +159,7 @@ def train_from_db(intents):
     chatbot = ChatBot('MyBot')
     trainer = Trainer(chatbot)
     
-    data = trainer.train_model(intents, num_epochs = 2000)
+    data = trainer.train_model(intents, num_epochs = 3000)
 
     print(f"Training complete")
     return data
