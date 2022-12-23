@@ -3,7 +3,6 @@ import torch.nn as nn
 
 from .utils import stem, tokenize, bag_of_words
 import random
-import numpy as np
 
 class NeuralNet(nn.Module):
 
