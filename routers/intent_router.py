@@ -43,6 +43,11 @@ async def get_intent_data(id: str, token: TokenPayLoad = Depends(decode_access_t
 @router.post("/create", response_description="Intent data added into the database", response_model = IntentResponse)
 async def add_intent_data(intent:Intent, token: TokenPayLoad = Depends(decode_access_token)):
     new_intent = await add_intent(intent)
+    if not new_intent:
+        raise IntentException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="Intent tag is already registered. Tag must be unique"
+        ) 
     return {
         "status": 200,
         "response_type": "success",
@@ -61,8 +66,8 @@ async def update_intent_data(id: str, req: UpdateIntent, token: TokenPayLoad = D
         updated_intent = await update_intent(id, req.dict())
     if not updated_intent:
         raise IntentException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Intent doesn't exist"
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="Intent doesn't exist" if update_intent is None else "Tag is already registered"
         )
     return {
         "status": 200,
