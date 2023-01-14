@@ -1,9 +1,12 @@
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, HTTPException, status, WebSocket
+from fastapi.security import OAuth2PasswordBearer
+
+from starlette.datastructures import Headers
+
 from jose import jwt
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from config.config import settings
 from models.auth import TokenPayLoad
-from typing import Literal
+from typing import Literal, Mapping
 import datetime
 
 
@@ -28,13 +31,15 @@ def create_token(data: dict, _type:Literal['access', 'refresh']='access'):
     return encoded_jwt
 
 
-async def decode_access_token(token: str = Depends(oauth2_scheme)):
+def decode_token(token:str, from_ws: bool = False) -> TokenPayLoad:
     try:
         payload = jwt.decode(
             token, settings.JWT_SECRET_KEY, algorithms=[settings.ALGORITHM]
         )
         token_data = TokenPayLoad(**payload)
-    except Exception as e:
+    except Exception:
+        if from_ws:
+            return None
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Could not validate credentials",
@@ -42,7 +47,17 @@ async def decode_access_token(token: str = Depends(oauth2_scheme)):
         )
     return token_data
 
-#TODO
-#Refresh token exp
-#Logout
-#Refresh Token sign key
+def decode_token_from_request(token:str = Depends(oauth2_scheme)) -> TokenPayLoad:
+    return decode_token(token)
+
+def decode_token_from_ws(ws: WebSocket) -> TokenPayLoad:
+    headers: Mapping[str, str]  = ws.headers
+    try:
+        token = headers['auth'].strip()
+    except KeyError:
+        return None
+    else:
+        return decode_token(token, from_ws=True)
+
+
+

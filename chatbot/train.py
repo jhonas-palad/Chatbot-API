@@ -6,10 +6,10 @@ import torch
 import torch.nn as nn
 from torch.utils.data import Dataset as DS, DataLoader
 
-from .model import ChatBot
+from .model import ChatBot, NeuralNet
 
-import os
-import sys
+from typing import Callable
+from enum import Enum
 
 
 class IntentDataset(DS):
@@ -75,6 +75,9 @@ class IntentDataset(DS):
 
         return self.n_samples
 
+
+TrainState = Enum('TrainState', ['STARTING', 'EXECUTING', 'FINISHED'])
+
 class Trainer:
 
     def __init__(self, chatbot, **kwargs):
@@ -88,26 +91,31 @@ class Trainer:
     @property
     def device(self):
         return self._device
-    def train_model(self, _intents, **kwargs):
+    async def train_model(self, _intents, **kwargs):
         
         dataset = self.dataset_cls(_intents)
 
         setattr(self.chatbot, 'dataset', dataset)
 
-        hidden_size = kwargs.pop('hidden_size', 8)
-        print(hidden_size)
+        hidden_size:int = kwargs.pop('hidden_size', 8)
         output_size = len(dataset.tags)
         input_size = len(dataset.word_collection)
         self.create_dsloader(batch_size = output_size, shuffle=True)
 
-        num_epochs = kwargs.pop('num_epochs', 1000)
+        
 
         # Create an instance 
         model = self.chatbot.create_nn_ins(input_layer_size= input_size,  \
                                          hidden_layer_size = hidden_size, \
                                          output_layer_size = output_size) \
 
-        self._run_epoch(num_epochs, model)
+        send: Callable = kwargs.pop('send', None)
+
+        await send({
+            "msg": f"Preparing parameters...",
+            "status": TrainState.STARTING.value
+        })
+        await self._run_epoch(model, send, **kwargs)
         
         return {
             'model_state': model.state_dict(),
@@ -121,11 +129,15 @@ class Trainer:
         }
 
 
-    def _run_epoch(self, n_epochs, model):
+    async def _run_epoch(self, model: NeuralNet, send: Callable, num_epochs = 1000, lr = 0.001):
+        await send({
+            "msg": f"Configuration -> number of epochs = {num_epochs}, learning rate = {lr}",
+            "status": TrainState.STARTING.value
+        })
         criterion = nn.CrossEntropyLoss()
-        optimizer = torch.optim.Adam(model.parameters(), lr = 0.001)
+        optimizer = torch.optim.Adam(model.parameters(), lr = lr)
         dataloader = self.dataloader_ins
-        for epoch in range(n_epochs):
+        for epoch in range(num_epochs):
             for x, y in dataloader:
 
                 x = x.to(self.device)
@@ -139,11 +151,14 @@ class Trainer:
                 loss.backward()
                 optimizer.step()
             if not ((epoch + 1) % 100):
-                print(f"epoch {epoch + 1} / {n_epochs}, loss = {loss.item():.4f}")
-    def save_model_data(self,intents ,save_filename = 'chatbot/model.pth', ):
-
-        self.chatbot.save_instance(intents, save_filename)
-
+                await send({
+                    "msg": f"Epoch {epoch + 1} / {num_epochs}, loss = {loss.item():.4f}",
+                    "status": TrainState.EXECUTING.value
+                })
+        await send({
+            "msg": f"Training finished with final loss of {loss.item():.4f}",
+            "status": TrainState.FINISHED.value
+        })
     def create_dsloader(self, **kwargs):
         if not hasattr(self.chatbot, 'dataset'):
             raise Exception(f"train_model() must be called first, before loading the dataset")
@@ -155,26 +170,11 @@ class Trainer:
 
         self.dataloader_ins = dataloader
 
-def train_from_db(intents):
+async def train_from_db(intents,send, **train_params):
     chatbot = ChatBot('MyBot')
     trainer = Trainer(chatbot)
     
-    data = trainer.train_model(intents, num_epochs = 3000)
-
-    print(f"Training complete")
+    data = await trainer.train_model(intents,send = send, **train_params)
     return data
-    # intents = utils.load_json('intents.json')
-    # intents = IntentDataset(intents)
-
-def train_from_doc(filename):
-    chatbot = ChatBot('MyBot')
-    trainer = Trainer(chatbot)
-    
-    trainer.train_model(filename, num_epochs = 1000)
-    print(f"Training complete")
-    # intents = utils.load_json('intents.json')
-    # intents = IntentDataset(intents)
-
-
 
 

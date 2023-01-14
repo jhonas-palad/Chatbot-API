@@ -63,7 +63,7 @@ class ChatBot:
 
         self.nn_model_cls = nn_model_cls
 
-    def create_nn_ins(self, **hyperparams):
+    def create_nn_ins(self, **hyperparams) -> NeuralNet:
         nn_instance = self.nn_model_cls(**hyperparams)
         self.nn_model = nn_instance
         return nn_instance

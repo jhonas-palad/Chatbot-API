@@ -4,6 +4,7 @@ from config.config import initiate_database
 from routers.intent_router import router as IntentRouter
 from routers.chat_router import router as ChatRouter
 from routers.auth_router import router as AuthRouter
+from routers.chatbot_router import router as ChatbotRouter
 from exception.intent import IntentException, intent_exception_handler
 from exception.auth import *
 
@@ -41,6 +42,8 @@ app.add_exception_handler(IntentException, intent_exception_handler)
 app.include_router(IntentRouter, tags=["Intent"], prefix="/intent")
 app.include_router(ChatRouter, tags=["Chat"], prefix="/chat")
 app.include_router(AuthRouter, tags=["Authentication"], prefix="/auth")
+app.include_router(ChatbotRouter, tags=["Chatbot"], prefix="/chatbot")
+
 
 @app.on_event("startup")
 async def start_database():

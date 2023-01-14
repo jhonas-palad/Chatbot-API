@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, status
-from auth.token import decode_access_token
+from auth.token import decode_token_from_request
 from models.auth import TokenPayLoad
 from database.intent_database import *
 from models.intent import *
@@ -9,7 +9,7 @@ from database.chatbot_model import *
 router = APIRouter()
 
 @router.get('/all', response_description="Intents retrieved", response_model=IntentResponse)
-async def get_all_intents(token: TokenPayLoad = Depends(decode_access_token)):
+async def get_all_intents(token: TokenPayLoad = Depends(decode_token_from_request)):
     intents = await retrieve_intents()
     return {
         "status": 200,
@@ -19,7 +19,7 @@ async def get_all_intents(token: TokenPayLoad = Depends(decode_access_token)):
     }
 
 @router.get('/get/{id}', response_description="Intent data retrieved", response_model=IntentResponse)
-async def get_intent_data(id: str, token: TokenPayLoad = Depends(decode_access_token)):
+async def get_intent_data(id: str, token: TokenPayLoad = Depends(decode_token_from_request)):
     try:
         id = PydanticObjectId(id)
     except Exception:
@@ -41,7 +41,7 @@ async def get_intent_data(id: str, token: TokenPayLoad = Depends(decode_access_t
 
 
 @router.post("/create", response_description="Intent data added into the database", response_model = IntentResponse)
-async def add_intent_data(intent:Intent, token: TokenPayLoad = Depends(decode_access_token)):
+async def add_intent_data(intent:Intent, token: TokenPayLoad = Depends(decode_token_from_request)):
     new_intent = await add_intent(intent)
     if not new_intent:
         raise IntentException(
@@ -57,7 +57,7 @@ async def add_intent_data(intent:Intent, token: TokenPayLoad = Depends(decode_ac
 
 
 @router.put("/update/{id}", response_model=IntentResponse)
-async def update_intent_data(id: str, req: UpdateIntent, token: TokenPayLoad = Depends(decode_access_token)):
+async def update_intent_data(id: str, req: UpdateIntent, token: TokenPayLoad = Depends(decode_token_from_request)):
     try:
         id = PydanticObjectId(id)
     except Exception:
@@ -77,7 +77,7 @@ async def update_intent_data(id: str, req: UpdateIntent, token: TokenPayLoad = D
     }
 
 @router.delete('/delete/{id}', response_description="Intent data removed from the database")
-async def delete_intent_data(id: str, token: TokenPayLoad = Depends(decode_access_token)):
+async def delete_intent_data(id: str, token: TokenPayLoad = Depends(decode_token_from_request)):
     try:
         id = PydanticObjectId(id)
     except Exception:
@@ -97,7 +97,7 @@ async def delete_intent_data(id: str, token: TokenPayLoad = Depends(decode_acces
     }
 
 @router.post('/train_bot', response_description="Train the chatbot model")
-async def train_bot(token: TokenPayLoad = Depends(decode_access_token)):
+async def train_bot(token: TokenPayLoad = Depends(decode_token_from_request)):
     intents = await retrieve_intents()
     dict_intents = [intent.dict() for intent in intents]
     chatbot_data_state = train_from_db(dict_intents)

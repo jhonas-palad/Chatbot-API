@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, Cookie, Response, status
 from fastapi.security import OAuth2PasswordRequestForm
-from auth.token import create_token, decode_access_token
-from models.auth import Token, TokenPayLoad, User
+from auth.token import create_token
+from models.auth import Token, User
 from exception.auth import AuthException, FieldValidationException
 from database.auth_database import *
 from jose import JWTError ,jwt as _jwt

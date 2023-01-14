@@ -2,7 +2,7 @@ from fastapi import APIRouter, WebSocketDisconnect, WebSocket
 from database.chatbot_model import fetch_model_states
 from database.intent_database import retrieve_intents
 from connection import ConnectionManager
-
+import time
 from chatbot import init_bot
 
 router = APIRouter()
@@ -27,5 +27,5 @@ async def websocket_endpoint(websocket: WebSocket = WebSocket):
             data = await websocket.receive_text()
             data = cb.get_response(data)
             await manager.send_response(data, websocket)
-    except WebSocketDisconnect as e:
+    except WebSocketDisconnect:
         manager.disconnect(websocket)
