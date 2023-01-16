@@ -9,6 +9,5 @@ def cmd_main():
             break;
 
         response = chatbot.get_response(query)
-        print(response)
 def init_bot(model_state, all_intents):
     return ChatBot.start_bot(model_state, all_intents)

@@ -97,7 +97,7 @@ class Trainer:
 
         setattr(self.chatbot, 'dataset', dataset)
 
-        hidden_size:int = kwargs.pop('hidden_size', 8)
+        hidden_size:int = kwargs.pop('hidden_layer_size', 8)
         output_size = len(dataset.tags)
         input_size = len(dataset.word_collection)
         self.create_dsloader(batch_size = output_size, shuffle=True)
@@ -115,7 +115,7 @@ class Trainer:
             "msg": f"Preparing parameters...",
             "status": TrainState.STARTING.value
         })
-        await self._run_epoch(model, send, **kwargs)
+        loss = await self._run_epoch(model, send, **kwargs)
         
         return {
             'model_state': model.state_dict(),
@@ -125,17 +125,18 @@ class Trainer:
                 'output_layer_size': output_size
             },
             'word_collection': dataset.word_collection,
-            'tags': dataset.tags
+            'tags': dataset.tags,
+            'loss': loss
         }
 
 
-    async def _run_epoch(self, model: NeuralNet, send: Callable, num_epochs = 1000, lr = 0.001):
+    async def _run_epoch(self, model: NeuralNet, send: Callable = None, num_epochs = 1000, learning_rate = 0.001):
         await send({
-            "msg": f"Configuration -> number of epochs = {num_epochs}, learning rate = {lr}",
+            "msg": f"Configuration -> number of epochs = {num_epochs}, learning rate = {learning_rate}",
             "status": TrainState.STARTING.value
         })
         criterion = nn.CrossEntropyLoss()
-        optimizer = torch.optim.Adam(model.parameters(), lr = lr)
+        optimizer = torch.optim.Adam(model.parameters(), lr = learning_rate)
         dataloader = self.dataloader_ins
         for epoch in range(num_epochs):
             for x, y in dataloader:
@@ -159,6 +160,7 @@ class Trainer:
             "msg": f"Training finished with final loss of {loss.item():.4f}",
             "status": TrainState.FINISHED.value
         })
+        return loss.item()
     def create_dsloader(self, **kwargs):
         if not hasattr(self.chatbot, 'dataset'):
             raise Exception(f"train_model() must be called first, before loading the dataset")

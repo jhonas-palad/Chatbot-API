@@ -1,4 +1,4 @@
-from fastapi import Depends, HTTPException, status, WebSocket
+from fastapi import Depends, HTTPException, status, Cookie
 from fastapi.security import OAuth2PasswordBearer
 
 from starlette.datastructures import Headers
@@ -22,7 +22,6 @@ def create_token(data: dict, _type:Literal['access', 'refresh']='access'):
                                         minutes=minutes)
     to_encode.update({"exp": expires_delta})
     sign_key = settings.JWT_SECRET_KEY if _type == 'access' else settings.JWT_REFRESH_SECRET_KEY
-    print(f"{_type}{sign_key}")
     encoded_jwt = jwt.encode(
                         to_encode, 
                         sign_key,
@@ -34,10 +33,10 @@ def create_token(data: dict, _type:Literal['access', 'refresh']='access'):
 def decode_token(token:str, from_ws: bool = False) -> TokenPayLoad:
     try:
         payload = jwt.decode(
-            token, settings.JWT_SECRET_KEY, algorithms=[settings.ALGORITHM]
+            token, settings.JWT_SECRET_KEY if not from_ws else settings.JWT_REFRESH_SECRET_KEY, algorithms=[settings.ALGORITHM]
         )
         token_data = TokenPayLoad(**payload)
-    except Exception:
+    except Exception as e:
         if from_ws:
             return None
         raise HTTPException(
@@ -50,14 +49,9 @@ def decode_token(token:str, from_ws: bool = False) -> TokenPayLoad:
 def decode_token_from_request(token:str = Depends(oauth2_scheme)) -> TokenPayLoad:
     return decode_token(token)
 
-def decode_token_from_ws(ws: WebSocket) -> TokenPayLoad:
-    headers: Mapping[str, str]  = ws.headers
-    try:
-        token = headers['auth'].strip()
-    except KeyError:
-        return None
-    else:
-        return decode_token(token, from_ws=True)
+def decode_token_from_ws(jwt: str | None = Cookie(None)) -> TokenPayLoad:
+    return decode_token(jwt, from_ws=True)
+    
 
 
 

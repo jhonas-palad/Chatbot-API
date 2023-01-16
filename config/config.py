@@ -25,6 +25,16 @@ class Settings(BaseSettings):
 
     #User
     SECRET_PASS:str
+    
+    #Chatbot
+    CHATBOT_NAME: str = 'asketty'
+    LEARNING_RATE_MIN:int | float
+    LEARNING_RATE_MAX:int | float
+    NUMBER_OF_EPOCHS_MIN:int | float
+    NUMBER_OF_EPOCHS_MAX:int | float
+    HIDDEN_LAYER_SIZE_MIN:int | float
+    HIDDEN_LAYER_SIZE_MAX:int | float
+
     class Config:
         env_file = './.env'
         orm_mode = True

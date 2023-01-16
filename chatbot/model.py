@@ -119,7 +119,6 @@ class ChatBot:
             tag_index, probability = self.nn_model.predict(output)
             tag = self.tags[tag_index]
             lower_orig_query = orig_query.lower()
-            print(tag_index, probability, tag)
             found_entity = []
             try:
                 entities = self.intents[tag]['entities']
@@ -132,7 +131,7 @@ class ChatBot:
                     found = True if lower_orig_query.find(entity.lower()) >= 0 else False
                     if found :
                         found_entity.append(entity)
-                    print(entity)
+      
                 responses = self.intents[tag]['responses']
                 if probability < threshold:
                     unknown_flag=True

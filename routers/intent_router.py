@@ -6,6 +6,7 @@ from models.intent import *
 from chatbot.train import train_from_db
 from exception.intent import IntentException
 from database.chatbot_model import *
+import asyncio
 router = APIRouter()
 
 @router.get('/all', response_description="Intents retrieved", response_model=IntentResponse)
