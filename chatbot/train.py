@@ -156,6 +156,12 @@ class Trainer:
                     "msg": f"Epoch {epoch + 1} / {num_epochs}, loss = {loss.item():.4f}",
                     "status": TrainState.EXECUTING.value
                 })
+            percent_complete = (epoch / num_epochs) * 100
+            await send({
+                'percent_complete': round(percent_complete),
+                'status': TrainState.EXECUTING.value
+            })
+            
         await send({
             "msg": f"Training finished with final loss of {loss.item():.4f}",
             "status": TrainState.FINISHED.value
