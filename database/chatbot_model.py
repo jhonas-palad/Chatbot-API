@@ -33,7 +33,7 @@ async def fetch_model_states():
     try:
         model_state = pickle.loads(model.state)
     except Exception as e:
-        print(f"Pickleee {e}")
+        print(f"Pickleee Error {e}")
     return model_state
 
 async def get_model_config() -> ModelConfig:
