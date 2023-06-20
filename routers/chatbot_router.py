@@ -18,7 +18,7 @@ manager = ConnectionManager()
 @router.get("/get_config")
 async def get_config(token: str = Depends(decode_token_from_request)):
     return await get_model_config()
-
+@router.post('/train_bot')
 async def train_bot(model_config: ModelConfig, token: TokenPayLoad = Depends(decode_token_from_request)):
     intents = await retrieve_intents()
     dict_intents = [intent.dict() for intent in intents]
