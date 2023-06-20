@@ -110,11 +110,7 @@ class Trainer:
                                          output_layer_size = output_size) \
 
         send: Callable = kwargs.pop('send', None)
-        print(kwargs)
-        # await send({
-        #     "msg": f"Preparing parameters...",
-        #     "status": TrainState.STARTING.value
-        # })
+
         loss = self._run_epoch_sync(model, **kwargs)
         
         return {
@@ -149,43 +145,6 @@ class Trainer:
 
         return loss.item()
 
-    # async def _run_epoch(self, model: NeuralNet, send: Callable = None, num_epochs = 1000, learning_rate = 0.001):
-    #     await send({
-    #         "msg": f"Configuration -> number of epochs = {num_epochs}, learning rate = {learning_rate}",
-    #         "status": TrainState.STARTING.value
-    #     })
-    #     criterion = nn.CrossEntropyLoss()
-    #     optimizer = torch.optim.Adam(model.parameters(), lr = learning_rate)
-    #     dataloader = self.dataloader_ins
-    #     for epoch in range(num_epochs):
-    #         for x, y in dataloader:
-
-    #             x = x.to(self.device)
-    #             y = y.to(self.device)
-
-    #             outputs = model(x) #make forward pass
-
-    #             loss = criterion(outputs, y)
-
-    #             optimizer.zero_grad()
-    #             loss.backward()
-    #             optimizer.step()
-    #         if not ((epoch + 1) % 100):
-    #             await send({
-    #                 "msg": f"Epoch {epoch + 1} / {num_epochs}, loss = {loss.item():.4f}",
-    #                 "status": TrainState.EXECUTING.value
-    #             })
-    #         percent_complete = (epoch / num_epochs) * 100
-    #         await send({
-    #             'percent_complete': round(percent_complete),
-    #             'status': TrainState.EXECUTING.value
-    #         })
-            
-    #     await send({
-    #         "msg": f"Training finished with final loss of {loss.item():.4f}",
-    #         "status": TrainState.FINISHED.value
-    #     })
-    #     return loss.item()
     def create_dsloader(self, **kwargs):
         if not hasattr(self.chatbot, 'dataset'):
             raise Exception(f"train_model() must be called first, before loading the dataset")
